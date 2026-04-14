@@ -9,13 +9,19 @@ import pickle
 from sklearn.preprocessing import StandardScaler
 from textblob import TextBlob
 import re
+import os
 
 
 class TweetPerformancePredictor:
     """Predict tweet performance and provide recommendations"""
 
-    def __init__(self, model_path: str = "model_artifact.pkl"):
+    def __init__(self, model_path: str = None):
         """Load the trained model"""
+        # If no path provided, use the script's directory
+        if model_path is None:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            model_path = os.path.join(script_dir, "model_artifact.pkl")
+
         with open(model_path, 'rb') as f:
             self.model = pickle.load(f)
         print("✓ Model loaded successfully")

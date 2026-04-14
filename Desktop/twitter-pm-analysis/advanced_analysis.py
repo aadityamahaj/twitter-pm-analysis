@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 import warnings
+import os
 
 warnings.filterwarnings('ignore')
 
@@ -14,7 +15,12 @@ warnings.filterwarnings('ignore')
 class ViralTweetAnalyzer:
     """Analyze what features drive high success scores"""
 
-    def __init__(self, csv_file: str = "tweets_features.csv"):
+    def __init__(self, csv_file: str = None):
+        # If no path provided, use the script's directory
+        if csv_file is None:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            csv_file = os.path.join(script_dir, "tweets_features.csv")
+
         self.df = pd.read_csv(csv_file)
         self.viral_tweets = self.df[self.df['performance'] == 'Viral']
         self.successful_tweets = self.df[self.df['performance'] == 'Successful']
