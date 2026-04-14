@@ -9,6 +9,7 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
+import os
 from scoring_system import TweetPerformancePredictor
 from advanced_analysis import ViralTweetAnalyzer
 
@@ -36,7 +37,10 @@ st.markdown("""
 # Load data
 @st.cache_resource
 def load_data():
-    df = pd.read_csv("tweets_features.csv")
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, "tweets_features.csv")
+    df = pd.read_csv(csv_path)
     df['created_at'] = pd.to_datetime(df['created_at']) if 'created_at' in df.columns else None
     return df
 
