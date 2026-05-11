@@ -267,8 +267,12 @@ function generateFlight(
     basePrice * template.priceMultiplier * CABIN_MULTIPLIERS[cabinClass] * variance
   );
 
+  // Generate booking URL (Kiwi format)
+  const bookingUrl = `https://www.kiwi.com/search/results/${origin}/${destination}/${departureDate}?price=${Math.floor(price)}&stops=${template.stops}`;
+
   return {
     id: `fs-${flightIdCounter++}`,
+    offerId: `mock-${flightIdCounter}`, // For compatibility with providers that use offerId
     segments,
     layovers,
     totalDuration,
@@ -284,6 +288,7 @@ function generateFlight(
     isRefundable: seed % 5 === 0,
     co2Kg: Math.round(totalDuration * 0.15 * (template.stops + 1)),
     fareClass: pickFareClass(cabinClass, price, basePrice),
+    bookingUrl,
   };
 }
 
