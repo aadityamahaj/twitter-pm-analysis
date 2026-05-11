@@ -108,15 +108,18 @@ export function FlightCard({ flight, origin, destination, date }: Props) {
                     bookingUrl: flight.bookingUrl
                   });
 
-                  // Primary: Use bookingUrl if available (works with any provider)
-                  if (flight.bookingUrl) {
-                    console.log('[Booking] Opening booking URL:', flight.bookingUrl);
-                    window.open(flight.bookingUrl, '_blank');
-                  } else if (flight.offerId) {
-                    // Fallback: Use Duffel's white-label booking with offerId
-                    const duffelBookingUrl = `https://www.duffel.com/booking/${flight.offerId}`;
-                    console.log('[Booking] Opening Duffel booking:', duffelBookingUrl);
-                    window.open(duffelBookingUrl, '_blank');
+                  let bookingUrl = flight.bookingUrl;
+
+                  // Fallback: Generate Kiwi booking URL if not provided
+                  if (!bookingUrl) {
+                    bookingUrl = `https://www.kiwi.com/search/results/${origin}/${destination}/${date}?price=${Math.floor(flight.price)}&stops=${flight.stops}`;
+                    console.log('[Booking] Generated fallback Kiwi URL:', bookingUrl);
+                  }
+
+                  // If we have a booking URL (from adapter or fallback), open it
+                  if (bookingUrl) {
+                    console.log('[Booking] Opening booking URL:', bookingUrl);
+                    window.open(bookingUrl, '_blank');
                   } else {
                     alert('Booking unavailable for this flight. Please try another option.');
                   }
