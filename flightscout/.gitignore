@@ -1,0 +1,11 @@
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+ml-backend/venv/
+ml-backend/__pycache__/
+ml-backend/models/*.pkl
+ml-backend/models/*.json
+ml-backend/data/*.parquet
+ml-backend/data/*.csv
+.DS_Store
+*.log
