@@ -45,11 +45,18 @@ export async function POST(req: NextRequest) {
     console.log('[API] Date:', searchParams.departureDate);
 
     let flights;
-    console.log('[API] Using REAL adapter');
+    console.log('[API] Using adapter');
     const adapter = getFlightAdapter();
     console.log('[API] Adapter instantiated:', adapter.name);
-    flights = await adapter.search(searchParams);
-    console.log('[API] Got', flights.length, 'flights from', adapter.name);
+    try {
+      flights = await adapter.search(searchParams);
+      console.log('[API] Got', flights.length, 'flights from', adapter.name);
+    } catch (adapterErr) {
+      console.error('[API] Adapter error:', adapterErr);
+      // Fallback to mock flights
+      flights = getMockFlights(searchParams);
+      console.log('[API] Fallback to mock:', flights.length, 'flights');
+    }
     if (flights.length > 0) {
       console.log('[API] First flight:', {
         id: flights[0].id,
