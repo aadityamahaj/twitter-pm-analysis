@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMockFlights } from '@/lib/mock-flights';
+import { getFlightAdapter } from '@/lib/flight-api-adapter';
 import { scoreFlights, getDefaultPriorities } from '@/lib/scoring';
 import { SearchParams, CabinClass, UserPriorities } from '@/types';
 import { generateSearchId } from '@/lib/utils';
@@ -15,8 +15,10 @@ import { generateSearchId } from '@/lib/utils';
  *   and implement the adapter in lib/flight-api-adapter.ts
  */
 export async function POST(req: NextRequest) {
+  console.log('[API /flights] POST request received');
   try {
     const body = await req.json();
+    console.log('[API] Request body:', { origin: body.origin, destination: body.destination, departureDate: body.departureDate });
     const { origin, destination, departureDate, returnDate, cabinClass, passengers, maxStops, priorities } = body;
 
     if (!origin || !destination || !departureDate) {
@@ -35,17 +37,39 @@ export async function POST(req: NextRequest) {
       priorities: priorities ?? getDefaultPriorities(),
     };
 
+    // Use configured provider from environment
     const provider = process.env.FLIGHT_API_PROVIDER ?? 'mock';
+    console.log('[API] ========== FLIGHT SEARCH START ==========');
+    console.log('[API] Provider:', provider);
+    console.log('[API] Route: ' + searchParams.origin + ' -> ' + searchParams.destination);
+    console.log('[API] Date:', searchParams.departureDate);
 
     let flights;
-    if (provider === 'mock') {
-      flights = getMockFlights(searchParams);
-    } else {
-      // Real API adapter (add key + implement adapter for your chosen provider)
-      throw new Error(`Flight provider "${provider}" not yet implemented. See lib/flight-api-adapter.ts.`);
+    console.log('[API] Using REAL adapter');
+    const adapter = getFlightAdapter();
+    console.log('[API] Adapter instantiated:', adapter.name);
+    flights = await adapter.search(searchParams);
+    console.log('[API] Got', flights.length, 'flights from', adapter.name);
+    if (flights.length > 0) {
+      console.log('[API] First flight:', {
+        id: flights[0].id,
+        price: flights[0].price,
+        bookingUrl: flights[0].bookingUrl,
+        offerId: flights[0].offerId,
+      });
     }
 
     const scored = scoreFlights({ flights, priorities: searchParams.priorities });
+    console.log('[API] After scoring:', scored.length, 'flights');
+    if (scored.length > 0) {
+      console.log('[API] Top flight:', {
+        id: scored[0].id,
+        score: scored[0].flightScoutScore,
+        price: scored[0].price,
+        bookingUrl: scored[0].bookingUrl,
+      });
+    }
+    console.log('[API] ========== FLIGHT SEARCH END ==========');
     const cheapestPrice = scored.length ? Math.min(...scored.map(f => f.price)) : 0;
 
     return NextResponse.json({
