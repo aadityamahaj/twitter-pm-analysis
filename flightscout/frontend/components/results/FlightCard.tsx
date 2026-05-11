@@ -28,18 +28,21 @@ export function FlightCard({ flight, origin, destination, date }: Props) {
 
   // Generate Google Flights search URL with pre-filled flight details
   const generateGoogleFlightsUrl = () => {
-    // Format: YYYY-MM-DD
-    const formattedDate = date;
-
-    // Build search query with flight details
-    const searchQuery = `flights from ${origin} to ${destination} ${formattedDate} ${mainAirline.name}`;
+    // Convert date from YYYY-MM-DD to a format Google understands
+    // Parse the date
+    const dateObj = new Date(date + 'T00:00:00');
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[dateObj.getUTCMonth()];
+    const day = dateObj.getUTCDate();
+    
+    // Build natural language search query
+    const searchQuery = `flights from ${origin} to ${destination} ${month} ${day}`;
 
     // Google Flights search URL
-    const baseUrl = 'https://www.google.com/travel/search';
+    const baseUrl = 'https://www.google.com/travel/explore/search';
     const params = new URLSearchParams({
       q: searchQuery,
       type: 'f',
-      tfs: formattedDate,
     });
 
     return `${baseUrl}?${params.toString()}`;
