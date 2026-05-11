@@ -100,9 +100,29 @@ export function FlightCard({ flight, origin, destination, date }: Props) {
 
               <Button
                 className="bg-sky-600 hover:bg-sky-700 text-white text-sm px-4 h-9 shrink-0"
-                onClick={() => alert('Book now → integrate with real flight booking API (Duffel, Amadeus, etc.)')}
+                onClick={() => {
+                  console.log('Book Now clicked', {
+                    flightId: flight.id,
+                    offerId: flight.offerId,
+                    price: flight.price,
+                    bookingUrl: flight.bookingUrl
+                  });
+
+                  // Primary: Use bookingUrl if available (works with any provider)
+                  if (flight.bookingUrl) {
+                    console.log('[Booking] Opening booking URL:', flight.bookingUrl);
+                    window.open(flight.bookingUrl, '_blank');
+                  } else if (flight.offerId) {
+                    // Fallback: Use Duffel's white-label booking with offerId
+                    const duffelBookingUrl = `https://www.duffel.com/booking/${flight.offerId}`;
+                    console.log('[Booking] Opening Duffel booking:', duffelBookingUrl);
+                    window.open(duffelBookingUrl, '_blank');
+                  } else {
+                    alert('Booking unavailable for this flight. Please try another option.');
+                  }
+                }}
               >
-                Select
+                Book Now
               </Button>
             </div>
           </div>
