@@ -26,6 +26,27 @@ export function FlightCard({ flight, origin, destination, date }: Props) {
   const score = flight.flightScoutScore ?? 0;
   const mainAirline = firstSeg.airline;
 
+  // Generate Google Flights search URL with pre-filled flight details
+  const generateGoogleFlightsUrl = () => {
+    // Format: YYYY-MM-DD
+    const formattedDate = date;
+
+    // Build search query with flight details
+    const searchQuery = `flights from ${origin} to ${destination} ${formattedDate} ${mainAirline.name}`;
+
+    // Google Flights search URL
+    const baseUrl = 'https://www.google.com/travel/search';
+    const params = new URLSearchParams({
+      q: searchQuery,
+      type: 'f',
+      tfs: formattedDate,
+    });
+
+    return `${baseUrl}?${params.toString()}`;
+  };
+
+  const googleFlightsUrl = generateGoogleFlightsUrl();
+
   return (
     <Card className="card-hover overflow-hidden">
       <CardContent className="p-0">
@@ -99,12 +120,11 @@ export function FlightCard({ flight, origin, destination, date }: Props) {
               </div>
 
               <Button
+                type="button"
                 className="bg-sky-600 hover:bg-sky-700 text-white text-sm px-4 h-9 shrink-0"
                 onClick={() => {
-                  // Always generate Kiwi booking URL
-                  const kiwiUrl = `https://www.kiwi.com/search/results/${origin}/${destination}/${date}`;
-                  console.log('[Book Now] Opening Kiwi URL:', kiwiUrl);
-                  window.open(kiwiUrl, '_blank');
+                  console.log('[Book Now] Opening Google Flights:', googleFlightsUrl);
+                  window.open(googleFlightsUrl, '_blank');
                 }}
               >
                 Book Now

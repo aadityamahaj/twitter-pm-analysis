@@ -85,9 +85,14 @@ def train(data_path: str | None, n_samples: int):
 
     print(f"\nLabel distribution:\n{df['price_movement'].value_counts()}")
 
+    # Encode movement labels to numeric (0, 1, 2) for XGBoost
+    movement_encoder = LabelEncoder()
+    y_movement_encoded = movement_encoder.fit_transform(df['price_movement'])
+    encoders['price_movement'] = movement_encoder
+
     X = df[FEATURE_COLS]
     y_price = df['price']
-    y_movement = df['price_movement']
+    y_movement = y_movement_encoded
 
     X_train, X_test, y_price_train, y_price_test, y_mov_train, y_mov_test = train_test_split(
         X, y_price, y_movement, test_size=0.15, random_state=42

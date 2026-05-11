@@ -3,6 +3,7 @@ import { getFlightAdapter } from '@/lib/flight-api-adapter';
 import { scoreFlights, getDefaultPriorities } from '@/lib/scoring';
 import { SearchParams, CabinClass, UserPriorities } from '@/types';
 import { generateSearchId } from '@/lib/utils';
+import { getMockFlights } from '@/lib/mock-flights';
 
 /**
  * POST /api/flights

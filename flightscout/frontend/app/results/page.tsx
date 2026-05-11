@@ -61,23 +61,40 @@ function ResultsContent() {
       priorities,
     };
 
-    const raw = getMockFlights(searchParams);
-    const scored = scoreFlights({ flights: raw, priorities });
-    setFlights(scored);
-    setLoading(false);
+    // Fetch real flights from API
+    fetch('/api/flights', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(searchParams),
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (response.data?.flights) {
+          setFlights(response.data.flights);
 
-    // Fetch ML prediction in background
-    if (scored.length > 0) {
-      const cheapest = scored.reduce((a, b) => a.price < b.price ? a : b);
-      predictPrice({
-        origin, destination,
-        departureDate: date,
-        returnDate,
-        cabinClass: cabin,
-        currentPrice: cheapest.price,
-        daysUntilDeparture: Math.max(0, Math.ceil((new Date(date).getTime() - Date.now()) / 86400000)),
-      }).then(setPrediction);
-    }
+          // Fetch ML prediction in background
+          if (response.data.flights.length > 0) {
+            const cheapest = response.data.flights.reduce((a: Flight, b: Flight) => a.price < b.price ? a : b);
+            predictPrice({
+              origin, destination,
+              departureDate: date,
+              returnDate,
+              cabinClass: cabin,
+              currentPrice: cheapest.price,
+              daysUntilDeparture: Math.max(0, Math.ceil((new Date(date).getTime() - Date.now()) / 86400000)),
+            }).then(setPrediction);
+          }
+        } else {
+          setFlights([]);
+        }
+      })
+      .catch(err => {
+        console.error('[Results] Error fetching flights:', err);
+        setFlights([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [origin, destination, date, returnDate, cabin, adults, maxStops]);
 
   const displayedFlights = flights

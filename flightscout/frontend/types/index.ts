@@ -59,6 +59,8 @@ export interface Flight {
   cabinClass: CabinClass;
   baggage: BaggageAllowance;
   deepLink?: string;    // link to book on airline site
+  bookingUrl?: string;  // Duffel white-label booking URL
+  offerId?: string;     // Duffel offer ID for direct booking
   fareClass?: string;
   isRefundable?: boolean;
   co2Kg?: number;
