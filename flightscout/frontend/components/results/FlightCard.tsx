@@ -101,28 +101,10 @@ export function FlightCard({ flight, origin, destination, date }: Props) {
               <Button
                 className="bg-sky-600 hover:bg-sky-700 text-white text-sm px-4 h-9 shrink-0"
                 onClick={() => {
-                  console.log('Book Now clicked', {
-                    flightId: flight.id,
-                    offerId: flight.offerId,
-                    price: flight.price,
-                    bookingUrl: flight.bookingUrl
-                  });
-
-                  let bookingUrl = flight.bookingUrl;
-
-                  // Fallback: Generate Kiwi booking URL if not provided
-                  if (!bookingUrl) {
-                    bookingUrl = `https://www.kiwi.com/search/results/${origin}/${destination}/${date}?price=${Math.floor(flight.price)}&stops=${flight.stops}`;
-                    console.log('[Booking] Generated fallback Kiwi URL:', bookingUrl);
-                  }
-
-                  // If we have a booking URL (from adapter or fallback), open it
-                  if (bookingUrl) {
-                    console.log('[Booking] Opening booking URL:', bookingUrl);
-                    window.open(bookingUrl, '_blank');
-                  } else {
-                    alert('Booking unavailable for this flight. Please try another option.');
-                  }
+                  // Always generate Kiwi booking URL
+                  const kiwiUrl = `https://www.kiwi.com/search/results/${origin}/${destination}/${date}`;
+                  console.log('[Book Now] Opening Kiwi URL:', kiwiUrl);
+                  window.open(kiwiUrl, '_blank');
                 }}
               >
                 Book Now
